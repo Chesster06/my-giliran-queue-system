@@ -40,6 +40,33 @@ export function Footer({ onNavigate }) {
               <li>
                 <button
                   type="button"
+                  onClick={() => onNavigate('admin')}
+                  style={{ color: '#cbd5e1', textAlign: 'left' }}
+                >
+                  Management Console
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('login')}
+                  style={{ color: '#cbd5e1', textAlign: 'left' }}
+                >
+                  Merchant Login
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('register')}
+                  style={{ color: '#cbd5e1', textAlign: 'left' }}
+                >
+                  Create Merchant Account
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
                   onClick={() => {
                     onNavigate('landing');
                     document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });

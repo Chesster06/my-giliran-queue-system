@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { INDUSTRY_EXAMPLES } from '../constants';
 import { generateQrDataUrl } from '../lib/qrcode';
+import { getCustomerAccessUrl } from '../lib/networkConfig';
 
 export function LandingPage() {
   const [sampleQrUrl, setSampleQrUrl] = useState('');
 
   useEffect(() => {
-    // Generate sample QR code representation for landing presentation
-    const targetUrl = window.location.origin + '/?page=customer&slug=counter-demo';
+    // Generate sample QR code representation using phone accessible Wi-Fi URL
+    const targetUrl = getCustomerAccessUrl('counter-demo');
     generateQrDataUrl(targetUrl, { width: 220 }).then(setSampleQrUrl);
   }, []);
 

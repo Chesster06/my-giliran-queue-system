@@ -42,7 +42,7 @@ export function Navbar({ onNavigate }) {
         </button>
 
         {/* Desktop Navigation */}
-        <nav style={{ display: 'none', alignItems: 'center', gap: '24px' }} className="desktop-nav" aria-label="Main Navigation">
+        <nav style={{ display: 'none', alignItems: 'center', gap: '20px' }} className="desktop-nav" aria-label="Main Navigation">
           <button
             type="button"
             onClick={() => scrollToSection('how-it-works')}
@@ -70,14 +70,37 @@ export function Navbar({ onNavigate }) {
           >
             Industries
           </button>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            onClick={() => scrollToSection('how-it-works')}
-            style={{ height: '38px', padding: '0 20px', fontSize: '0.875rem' }}
-          >
-            Get Started
-          </button>
+
+          {/* Auth Action Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '6px' }}>
+            <button
+              type="button"
+              onClick={() => onNavigate && onNavigate('login')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#0f172a',
+                fontSize: '0.88rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                transition: 'background-color 0.15s'
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = '#f1f5f9')}
+              onMouseOut={(e) => (e.target.style.backgroundColor = 'transparent')}
+            >
+              Log in
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => onNavigate && onNavigate('register')}
+              style={{ height: '38px', padding: '0 18px', fontSize: '0.875rem' }}
+            >
+              Sign Up Free
+            </button>
+          </div>
         </nav>
 
         {/* Mobile Hamburger Button */}
@@ -122,14 +145,30 @@ export function Navbar({ onNavigate }) {
           >
             Industries
           </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            style={{ width: '100%', justifyContent: 'center', minHeight: '44px' }}
-            onClick={() => scrollToSection('how-it-works')}
-          >
-            Get Started
-          </button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '4px' }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              style={{ justifyContent: 'center', minHeight: '44px', fontWeight: '700' }}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onNavigate) onNavigate('login');
+              }}
+            >
+              Log in
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ justifyContent: 'center', minHeight: '44px' }}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onNavigate) onNavigate('register');
+              }}
+            >
+              Sign Up
+            </button>
+          </div>
         </div>
       )}
 
