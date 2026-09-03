@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { INDUSTRY_EXAMPLES } from '../constants';
 import { generateQrDataUrl } from '../lib/qrcode';
 import { getCustomerAccessUrl } from '../lib/networkConfig';
+import { getAllQueues } from '../lib/queueStore';
 
 export function LandingPage() {
   const [sampleQrUrl, setSampleQrUrl] = useState('');
 
   useEffect(() => {
-    // Generate sample QR code representation using phone accessible Wi-Fi URL
-    const targetUrl = getCustomerAccessUrl('counter-demo');
+    const queues = getAllQueues();
+    const activeSlug = queues.length > 0 ? queues[0].slug : 'walkin';
+    const targetUrl = getCustomerAccessUrl(activeSlug);
     generateQrDataUrl(targetUrl, { width: 220 }).then(setSampleQrUrl);
   }, []);
 
@@ -181,28 +183,36 @@ export function LandingPage() {
               </p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '28px' }}>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>✓</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '3px' }}>
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   <div>
                     <strong style={{ color: 'var(--text-main)' }}>Safe Sequential Numbering:</strong>
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Automated ticketing system with custom prefixes ([A], [B]) preventing collisions.</div>
                   </div>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>✓</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '3px' }}>
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   <div>
                     <strong style={{ color: 'var(--text-main)' }}>Contactless Mobile Check-In:</strong>
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Visitors hold their tickets on their personal phones, keeping physical lobbies clean and spacious.</div>
                   </div>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>✓</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '3px' }}>
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   <div>
                     <strong style={{ color: 'var(--text-main)' }}>Instant QR Code Generation:</strong>
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Easily print or share your unique venue counter QR code anytime.</div>
                   </div>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>✓</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '3px' }}>
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   <div>
                     <strong style={{ color: 'var(--text-main)' }}>High Performance & Low Data:</strong>
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Ultra-lightweight web interface that loads instantly even on weak cellular networks.</div>
@@ -273,7 +283,9 @@ export function LandingPage() {
                 className="card"
                 style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid var(--border-subtle)' }}
               >
-                <span style={{ color: 'var(--primary)', fontWeight: '800', fontSize: '1.1rem' }}>✓</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
                 <span style={{ fontWeight: '600', fontSize: '0.95rem', color: 'var(--text-main)' }}>{item}</span>
               </div>
             ))}

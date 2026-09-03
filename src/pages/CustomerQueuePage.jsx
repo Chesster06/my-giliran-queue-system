@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getQueueBySlug, getEntriesByQueue, joinQueue } from '../lib/queueStore';
+import { getAllQueues, getQueueBySlug, getEntriesByQueue, joinQueue } from '../lib/queueStore';
 import { QUEUE_STATUS } from '../constants';
 import { Badge } from '../components/Badge';
 
-export function CustomerQueuePage({ queueSlug = 'utama-walkin', onNavigate }) {
+export function CustomerQueuePage({ queueSlug = '', onNavigate }) {
   const [queue, setQueue] = useState(null);
   const [customerName, setCustomerName] = useState('');
   const [myEntry, setMyEntry] = useState(null);
@@ -74,7 +74,8 @@ export function CustomerQueuePage({ queueSlug = 'utama-walkin', onNavigate }) {
     }
 
     if (!q) {
-      q = getQueueBySlug('utama-walkin');
+      const all = getAllQueues();
+      if (all.length > 0) q = all[0];
     }
 
     setQueue(q);

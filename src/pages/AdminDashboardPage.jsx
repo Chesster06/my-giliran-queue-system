@@ -295,17 +295,18 @@ export function AdminDashboardPage({ onNavigate }) {
                   type="button"
                   className="btn btn-secondary btn-xs"
                   onClick={() => setSelectedProject(null)}
-                  style={{ fontWeight: '700' }}
+                  style={{ fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                 >
-                  ← All Projects
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                  </svg>
+                  <span>All Projects</span>
                 </button>
                 <span style={{ color: 'var(--text-muted)' }}>/</span>
                 <h1 className="topbar-title" style={{ margin: 0 }}>
                   {selectedProject.name}
                 </h1>
-                <span className="project-prefix-box" style={{ width: '26px', height: '26px', fontSize: '0.8rem' }}>
-                  {selectedProject.prefix}
-                </span>
               </div>
             )}
 
@@ -395,7 +396,6 @@ export function AdminDashboardPage({ onNavigate }) {
                     >
                       <div className="card-top-info">
                         <div className="project-meta-box">
-                          <span className="project-prefix-box">{project.prefix}</span>
                           <div>
                             <h3 className="project-card-title">{project.name}</h3>
                             <span className="project-card-slug">/{project.slug}</span>
@@ -427,14 +427,18 @@ export function AdminDashboardPage({ onNavigate }) {
                         <button
                           type="button"
                           className="btn btn-primary"
-                          style={{ flex: 1 }}
+                          style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedProject(project);
                             setActiveTab('projects');
                           }}
                         >
-                          Enter Workspace ➔
+                          <span>Enter Workspace</span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                          </svg>
                         </button>
 
                         <button
@@ -631,12 +635,17 @@ export function AdminDashboardPage({ onNavigate }) {
                                       <button
                                         type="button"
                                         className="btn btn-primary btn-xs"
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setSelectedProject(project);
                                         }}
                                       >
-                                        Open Workspace ➔
+                                        <span>Open Workspace</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                          <line x1="5" y1="12" x2="19" y2="12"/>
+                                          <polyline points="12 5 19 12 12 19"/>
+                                        </svg>
                                       </button>
 
                                       <button
@@ -1140,8 +1149,13 @@ export function AdminDashboardPage({ onNavigate }) {
               {/* SECTION 3: DANGER ZONE PANEL */}
               <div>
                 <div style={{ marginBottom: '12px' }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#991b1b', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>⚠️ Danger Zone & Reset Controls</span>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#991b1b', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Danger Zone & Reset Controls</span>
                   </h3>
                   <p className="text-muted text-sm" style={{ margin: '4px 0 0 0' }}>
                     Actions here directly modify or clear queue turns and saved system records.
@@ -1215,8 +1229,13 @@ export function AdminDashboardPage({ onNavigate }) {
                 type="button"
                 className="modal-close-btn"
                 onClick={() => setShowCreateModal(false)}
+                aria-label="Close"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                ✕
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
 
@@ -1268,8 +1287,12 @@ export function AdminDashboardPage({ onNavigate }) {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  Create Project & Enter Workspace ➔
+                <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Create Project & Enter Workspace</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
                 </button>
               </div>
             </form>
@@ -1289,18 +1312,29 @@ export function AdminDashboardPage({ onNavigate }) {
                 type="button"
                 className="modal-close-btn"
                 onClick={() => setSelectedQrProject(null)}
+                aria-label="Close"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                ✕
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
 
-            <div className="printable-qr-stand" style={{ marginTop: '20px', border: '2px solid var(--primary)', borderRadius: '12px' }}>
+            <div
+              id="qr-stand-print-area"
+              className="printable-qr-stand"
+              style={{ marginTop: '20px', border: '2px solid var(--primary)', borderRadius: '12px' }}
+            >
               <div className="stand-header">
-                <img src="/logo-icon.png?v=2" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '6px' }} />
-                <h2 className="stand-brand-name">MyGiliran</h2>
+                <img src="/logo-icon.png?v=2" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'contain' }} />
+                <h2 className="stand-brand-name" style={{ margin: 0, color: '#0e4c49' }}>
+                  My<span style={{ color: '#047857' }}>Giliran</span>
+                </h2>
               </div>
 
-              <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '14px' }}>
+              <div className="stand-project-name" style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '14px' }}>
                 {selectedQrProject.name}
               </div>
 
@@ -1316,16 +1350,6 @@ export function AdminDashboardPage({ onNavigate }) {
                 <p>1. Scan QR with your Phone Camera</p>
                 <p>2. Enter your Name</p>
                 <p>3. Watch Turn on your Phone Live</p>
-              </div>
-
-              {/* Wi-Fi Phone Direct Link Notice */}
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px 14px', marginTop: '14px', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
-                  📶 Direct Wi-Fi Phone Access URL
-                </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: '#15803d', wordBreak: 'break-all', fontWeight: '700' }}>
-                  {getCustomerAccessUrl(selectedQrProject.slug)}
-                </div>
               </div>
             </div>
 

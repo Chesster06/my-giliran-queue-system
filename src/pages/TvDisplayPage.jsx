@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getQueueBySlug, getQueueEntries, playCallChime, subscribeToQueue, QUEUE_STATUS } from '../lib/queueStore';
+import { getAllQueues, getQueueBySlug, getQueueEntries, playCallChime, subscribeToQueue, QUEUE_STATUS } from '../lib/queueStore';
 import { generateQrDataUrl } from '../lib/qrcode';
 import { getCustomerAccessUrl } from '../lib/networkConfig';
 
-export function TvDisplayPage({ queueSlug = 'counter-demo', onNavigate }) {
+export function TvDisplayPage({ queueSlug = '', onNavigate }) {
   const [queue, setQueue] = useState(null);
   const [entries, setEntries] = useState([]);
   const [qrDataUrl, setQrDataUrl] = useState('');
@@ -26,7 +26,11 @@ export function TvDisplayPage({ queueSlug = 'counter-demo', onNavigate }) {
   }, [queueSlug]);
 
   function refresh() {
-    const q = getQueueBySlug(queueSlug);
+    let q = queueSlug ? getQueueBySlug(queueSlug) : null;
+    if (!q) {
+      const all = getAllQueues();
+      if (all.length > 0) q = all[0];
+    }
     if (q) {
       setQueue(q);
       const qEntries = getQueueEntries(q.id);
@@ -65,10 +69,15 @@ export function TvDisplayPage({ queueSlug = 'counter-demo', onNavigate }) {
       <header className="tv-header">
         <div className="tv-header-left">
           <div className="tv-logo-badge">
-            <img src="/logo-icon.png?v=2" alt="Logo" style={{ width: '36px', height: '36px', borderRadius: '6px' }} />
+            <img src="/logo-icon.png?v=2" alt="Logo" style={{ width: '42px', height: '42px', borderRadius: '10px', objectFit: 'contain' }} />
             <div>
-              <span className="tv-brand-title">MyGiliran TV</span>
-              <span className="tv-queue-name">{queue?.name || 'Waiting Hall Display'}</span>
+              <span className="tv-brand-title">
+                My<span className="tv-brand-accent">Giliran</span>
+              </span>
+              <span className="tv-queue-name">
+                <span className="tv-queue-dot"></span>
+                {queue?.name || 'Kaunter Utama'}
+              </span>
             </div>
           </div>
         </div>
@@ -82,16 +91,25 @@ export function TvDisplayPage({ queueSlug = 'counter-demo', onNavigate }) {
             className="tv-ctrl-btn"
             onClick={toggleFullscreen}
             title="Toggle Fullscreen"
+            aria-label="Toggle Fullscreen"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            ⛶
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+            </svg>
           </button>
           <button
             type="button"
             className="tv-ctrl-btn"
             onClick={() => onNavigate('admin')}
             title="Back to Admin Dashboard"
+            aria-label="Close TV View"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            ✕
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
       </header>
@@ -100,28 +118,8 @@ export function TvDisplayPage({ queueSlug = 'counter-demo', onNavigate }) {
       <main className="tv-main-grid">
         {/* Left Column: Huge Currently Serving Box */}
         <section className="tv-serving-box">
-          <div className="tv-serving-label">
-            <span className="tv-pulsing-dot"></span>
-            SEDANG DIPANGGIL • NOW SERVING
-          </div>
-
           <div className="tv-number-display">
             {servingEntry ? servingEntry.queue_number : (queue?.current_serving && queue.current_serving !== '-' ? queue.current_serving : '---')}
-          </div>
-
-          <div className="tv-customer-callout">
-            {servingEntry ? (
-              <>
-                <span className="tv-lbl">Pelanggan:</span>
-                <span className="tv-name">{servingEntry.customer_name}</span>
-              </>
-            ) : (
-              <span className="tv-idle-text">Sila bersedia untuk giliran anda</span>
-            )}
-          </div>
-
-          <div className="tv-counter-ref">
-            {queue?.name || 'Kaunter Utama'}
           </div>
         </section>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getCurrentUser, subscribeToAuth } from '../lib/authStore';
 
 export function AdminSidebar({
   collapsed,
@@ -16,14 +17,34 @@ export function AdminSidebar({
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   
-  // Profile Information
-  const [profileName, setProfileName] = useState(localStorage.getItem('mygiliran_profile_name') || 'LO');
-  const [profileRole, setProfileRole] = useState(localStorage.getItem('mygiliran_profile_role') || 'Admin Owner');
-  const [profileEmail, setProfileEmail] = useState(localStorage.getItem('mygiliran_profile_email') || 'lo@mygiliran.com');
+  // Profile Information (dynamically derived from active logged-in user)
+  const initialUser = getCurrentUser();
+  const [profileName, setProfileName] = useState(initialUser?.name || localStorage.getItem('mygiliran_profile_name') || 'Admin');
+  const [profileRole, setProfileRole] = useState(initialUser?.role || localStorage.getItem('mygiliran_profile_role') || 'Owner');
+  const [profileEmail, setProfileEmail] = useState(initialUser?.email || localStorage.getItem('mygiliran_profile_email') || '');
   const [profileAvatar, setProfileAvatar] = useState(
+    initialUser?.avatar ||
     localStorage.getItem('mygiliran_profile_avatar') ||
     'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
   );
+
+  useEffect(() => {
+    const unsub = subscribeToAuth((user) => {
+      if (user) {
+        setProfileName(user.name || 'Admin');
+        setProfileEmail(user.email || '');
+        setProfileRole(user.role || 'Owner');
+        if (user.avatar) setProfileAvatar(user.avatar);
+      } else {
+        setProfileName('Admin');
+        setProfileEmail('');
+        setProfileRole('Owner');
+      }
+    });
+    return () => {
+      if (unsub) unsub();
+    };
+  }, []);
 
   // Form edit state
   const [editName, setEditName] = useState(profileName);
@@ -282,13 +303,18 @@ export function AdminSidebar({
         <div className="admin-modal-backdrop" onClick={() => setShowEditModal(false)}>
           <div className="admin-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px' }}>
             <div className="modal-header-row">
-              <h3>Admin Profile Details</h3>
+              <h3>Edit Profile</h3>
               <button
                 type="button"
                 className="modal-close-btn"
                 onClick={() => setShowEditModal(false)}
+                aria-label="Close"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                ✕
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
 

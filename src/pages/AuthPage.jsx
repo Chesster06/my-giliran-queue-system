@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { loginUser, registerUser, loginWithGoogleDemo } from '../lib/authStore';
+import { loginUser, registerUser, signInWithGoogle } from '../lib/authStore';
 
 export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
-  const [email, setEmail] = useState(initialMode === 'login' ? 'hlsalim.ux@gmail.com' : '');
-  const [password, setPassword] = useState(initialMode === 'login' ? 'password123' : '');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -25,15 +25,10 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
     setMode(newMode);
     setErrorMsg('');
     setSuccessMsg('');
-    if (newMode === 'login') {
-      setEmail('hlsalim.ux@gmail.com');
-      setPassword('password123');
-    } else {
-      setEmail('');
-      setPassword('');
-      setName('');
-      setBusinessName('');
-    }
+    setEmail('');
+    setPassword('');
+    setName('');
+    setBusinessName('');
   }
 
   async function handleSubmit(e) {
@@ -44,19 +39,19 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
 
     try {
       if (mode === 'login') {
-        const user = loginUser({ email, password });
+        const user = await loginUser({ email, password });
         setSuccessMsg(`Welcome back, ${user.name}! Logging you in...`);
         setTimeout(() => {
           if (onAuthSuccess) onAuthSuccess(user);
-          else onNavigate('landing');
-        }, 600);
+          else onNavigate('admin');
+        }, 500);
       } else {
-        const user = registerUser({ name, email, password, businessName });
+        const user = await registerUser({ name, email, password, businessName });
         setSuccessMsg(`Account created for ${user.name}! Redirecting...`);
         setTimeout(() => {
           if (onAuthSuccess) onAuthSuccess(user);
-          else onNavigate('landing');
-        }, 750);
+          else onNavigate('admin');
+        }, 500);
       }
     } catch (err) {
       setErrorMsg(err.message || 'Authentication error. Please try again.');
@@ -65,23 +60,16 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
     }
   }
 
-  function handleGoogleLogin() {
+  async function handleGoogleLogin() {
     setIsLoading(true);
     setErrorMsg('');
-    setTimeout(() => {
-      try {
-        const user = loginWithGoogleDemo();
-        setSuccessMsg(`Signed in with Google as ${user.email}!`);
-        setTimeout(() => {
-          if (onAuthSuccess) onAuthSuccess(user);
-          else onNavigate('landing');
-        }, 600);
-      } catch (err) {
-        setErrorMsg('Google sign-in error.');
-      } finally {
-        setIsLoading(false);
-      }
-    }, 400);
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      setErrorMsg(err.message || 'Google sign-in error.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function handleForgotPassword(e) {
@@ -124,11 +112,13 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
               </svg>
             </div>
 
-            {/* Headline with Greeting and Wave Hand */}
+            {/* Headline with Greeting and Sparkle Icon */}
             <h1 className="auth-visual-heading">
               Hello <br />
               <span className="auth-gradient-text">MyGiliran!</span>{' '}
-              <span className="auth-wave-emoji" role="img" aria-label="waving hand">👋</span>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'inline-block', verticalAlign: 'middle', color: '#10b981' }}>
+                <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"/>
+              </svg>
             </h1>
 
             {/* Value Proposition Description */}
@@ -136,11 +126,28 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
               Skip repetitive queue chaos and manual ticketing. Get highly productive through instant QR-based automation and save tons of time!
             </p>
 
-            {/* Highlights pill tags */}
+            {/* Highlights pill tags with SVGs */}
             <div className="auth-pill-badges">
-              <span className="auth-mini-badge">⚡ Instant QR Scan</span>
-              <span className="auth-mini-badge">📱 100% Zero-App</span>
-              <span className="auth-mini-badge">🔔 Live Queue Callouts</span>
+              <span className="auth-mini-badge">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                <span>Instant QR Scan</span>
+              </span>
+              <span className="auth-mini-badge">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                  <line x1="12" y1="18" x2="12.01" y2="18"/>
+                </svg>
+                <span>100% Zero-App</span>
+              </span>
+              <span className="auth-mini-badge">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span>Live Queue Callouts</span>
+              </span>
             </div>
 
             <div className="auth-visual-footer">
@@ -175,8 +182,13 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                 type="button"
                 className="auth-back-link"
                 onClick={() => onNavigate('landing')}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                ← Back to Home
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"/>
+                  <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                <span>Back to Home</span>
               </button>
             </div>
 
@@ -217,14 +229,24 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
             {/* Feedback Alerts */}
             {errorMsg && (
               <div className="auth-alert error" role="alert">
-                <span className="auth-alert-icon">⚠️</span>
+                <span className="auth-alert-icon" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </span>
                 <span>{errorMsg}</span>
               </div>
             )}
 
             {successMsg && (
               <div className="auth-alert success" role="alert">
-                <span className="auth-alert-icon">✓</span>
+                <span className="auth-alert-icon" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
                 <span>{successMsg}</span>
               </div>
             )}
@@ -243,11 +265,11 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                       id="auth-name"
                       type="text"
                       className="auth-input-line"
-                      placeholder="e.g. Salim Hendrawan"
+                      placeholder="e.g. Ahmad Albab"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
-                      autoComplete="name"
+                      autoComplete="off"
                     />
                   </div>
 
@@ -259,9 +281,10 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                       id="auth-biz"
                       type="text"
                       className="auth-input-line"
-                      placeholder="e.g. Klinik Pratama Sehat"
+                      placeholder="e.g. Klinik & Farmasi Utama"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
+                      autoComplete="off"
                     />
                   </div>
                 </>
@@ -276,11 +299,11 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                   id="auth-email"
                   type="email"
                   className="auth-input-line"
-                  placeholder="hlsalim.ux@gmail.com"
+                  placeholder="anda@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  autoComplete="email"
+                  autoComplete="off"
                 />
               </div>
 
@@ -368,12 +391,6 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                 </button>
               </div>
             )}
-
-            {/* Quick Demo Credentials Reminder */}
-            <div className="auth-demo-hint">
-              <strong>Quick Test Account:</strong> <code>hlsalim.ux@gmail.com</code> / <code>password123</code>
-            </div>
-
           </div>
         </div>
 
@@ -388,9 +405,13 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(false)}
-                style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: 'var(--text-muted)' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', padding: '4px' }}
+                aria-label="Close modal"
               >
-                ✕
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
               </button>
             </div>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.5' }}>

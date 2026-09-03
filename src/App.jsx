@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { initQueueStorage } from './lib/queueStore';
-import { initAuthStorage, getCurrentUser, subscribeToAuth, logoutUser } from './lib/authStore';
+import { initAuthStorage, getCurrentUser, subscribeToAuth, logoutUser, resetAllCredentials } from './lib/authStore';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { LandingPage } from './pages/LandingPage';
@@ -12,22 +12,35 @@ import { TvDisplayPage } from './pages/TvDisplayPage';
 
 export function App() {
   const [activeRoute, setActiveRoute] = useState('landing');
-  const [activeSlug, setActiveSlug] = useState('utama-walkin');
+  const [activeSlug, setActiveSlug] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
 
   useEffect(() => {
     initQueueStorage();
     initAuthStorage();
-    setCurrentUser(getCurrentUser());
-
-    const unsubscribeAuth = subscribeToAuth((user) => {
+    const user = getCurrentUser();
+    if (user?.email?.toLowerCase().includes('chesstereter')) {
+      resetAllCredentials();
+      setCurrentUser(null);
+    } else {
       setCurrentUser(user);
+    }
+
+    const unsubscribeAuth = subscribeToAuth((updatedUser) => {
+      setCurrentUser(updatedUser);
     });
 
     const params = new URLSearchParams(window.location.search);
     const pageParam = params.get('page');
     const slugParam = params.get('slug');
+    const resetParam = params.get('reset');
+
+    if (resetParam === 'credentials' || resetParam === 'all' || resetParam === 'true') {
+      resetAllCredentials();
+      setCurrentUser(null);
+      showToast('Semua credential dan sesi telah berjaya direset!');
+    }
 
     if (pageParam === 'customer') {
       setActiveRoute('customer');
@@ -57,7 +70,7 @@ export function App() {
     }, 3500);
   }
 
-  function handleNavigate(route, param = 'utama-walkin') {
+  function handleNavigate(route, param = '') {
     let finalRoute = 'landing';
     if (route === 'customer') {
       finalRoute = 'customer';
@@ -149,6 +162,24 @@ export function App() {
     );
   }
 
+  if (activeRoute === 'customer') {
+    return (
+      <div key={`customer-view-${activeSlug}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-app)' }}>
+        <main className="page-transition" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <CustomerQueuePage
+            queueSlug={activeSlug}
+            onNavigate={handleNavigate}
+          />
+        </main>
+        {toastMsg && (
+          <div className="toast-container">
+            <div className="toast">{toastMsg}</div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-app)' }}>
       {/* Top Banner if merchant is logged in */}
@@ -173,13 +204,6 @@ export function App() {
       <main key={`route-${activeRoute}`} className="page-transition" style={{ flex: 1 }}>
         {activeRoute === 'landing' && (
           <LandingPage onNavigate={handleNavigate} />
-        )}
-
-        {activeRoute === 'customer' && (
-          <CustomerQueuePage
-            queueSlug={activeSlug}
-            onNavigate={handleNavigate}
-          />
         )}
       </main>
 

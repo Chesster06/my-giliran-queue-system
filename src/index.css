@@ -2197,21 +2197,116 @@ a {
   color: #64748b;
 }
 
-/* Print Styles */
+/* Print Styles: Dedicated Clean Single-Page Standee Print */
 @media print {
+  @page {
+    size: portrait;
+    margin: 0;
+  }
+
+  html, body {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide entire interface, dashboard, modals, and backdrops */
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
   }
-  #qr-stand-print-area, #qr-stand-print-area * {
-    visibility: visible;
+
+  /* Reveal strictly the Standee print area and its children */
+  #qr-stand-print-area,
+  #qr-stand-print-area * {
+    visibility: visible !important;
   }
+
   #qr-stand-print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    border: none;
-    box-shadow: none;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 380px !important;
+    max-width: 85vw !important;
+    padding: 36px 28px !important;
+    background-color: #ffffff !important;
+    border: 3px solid #047857 !important;
+    border-radius: 20px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    margin: 0 !important;
+    page-break-inside: avoid !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    break-after: avoid !important;
+    z-index: 999999 !important;
+  }
+
+  #qr-stand-print-area .stand-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  #qr-stand-print-area .stand-header img {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 8px !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+
+  #qr-stand-print-area .stand-brand-name {
+    font-size: 1.55rem !important;
+    font-weight: 800 !important;
+    color: #0e4c49 !important;
+    margin: 0 !important;
+  }
+
+  #qr-stand-print-area .stand-project-name {
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+    color: #047857 !important;
+    margin-bottom: 18px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  #qr-stand-print-area .stand-qr-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-bottom: 20px !important;
+  }
+
+  #qr-stand-print-area .stand-qr-wrapper img {
+    width: 220px !important;
+    height: 220px !important;
+    display: block !important;
+    margin: 0 auto !important;
+    border-radius: 8px !important;
+  }
+
+  #qr-stand-print-area .stand-instructions {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 14px 18px !important;
+    border-radius: 12px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+    text-align: center !important;
   }
 }
 
@@ -2533,15 +2628,33 @@ a {
 }
 
 /* ==========================================================================
-   TV Display Screen Mode
+   TV Display Screen Mode (Website Theme - Clean Emerald & Slate)
    ========================================================================== */
+@keyframes tvPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(4, 120, 87, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(4, 120, 87, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(4, 120, 87, 0);
+  }
+}
+
 .tv-display-root {
   min-height: 100vh;
-  background-color: #061916;
-  color: #f8fafc;
+  background-color: var(--bg-app, #f8fafc);
+  background-image: 
+    radial-gradient(circle at 10% 15%, rgba(4, 120, 87, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 85%, rgba(13, 148, 136, 0.05) 0%, transparent 40%);
+  color: var(--text-main, #0f172a);
   display: flex;
   flex-direction: column;
-  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif);
   overflow: hidden;
 }
 
@@ -2549,9 +2662,11 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 32px;
-  background-color: #042521;
-  border-bottom: 2px solid #0d4a42;
+  padding: 16px 36px;
+  background-color: var(--bg-surface, #ffffff);
+  border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  z-index: 10;
 }
 
 .tv-header-left, .tv-logo-badge {
@@ -2560,17 +2675,52 @@ a {
   gap: 14px;
 }
 
+.tv-logo-badge img {
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
 .tv-brand-title {
-  font-size: 1.25rem;
-  font-weight: 900;
-  color: #34d399;
-  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0e4c49;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tv-brand-accent {
+  color: #047857;
+}
+
+.tv-brand-tag {
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .tv-queue-name {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: #64748b;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tv-queue-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
 }
 
 .tv-header-right {
@@ -2580,119 +2730,153 @@ a {
 }
 
 .tv-clock {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 800;
-  font-family: var(--font-mono, monospace);
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.08);
-  padding: 6px 16px;
-  border-radius: 6px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  color: #0f172a;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 6px 18px;
+  border-radius: 10px;
   letter-spacing: 0.05em;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .tv-ctrl-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  color: #475569;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.2rem;
-  transition: background-color 0.15s;
+  font-size: 1.15rem;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .tv-ctrl-btn:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
 }
 
 .tv-main-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  padding: 36px;
-  gap: 36px;
+  grid-template-columns: 1.45fr 1fr;
+  padding: 32px 36px;
+  gap: 32px;
+  overflow: auto;
 }
 
 @media (max-width: 992px) {
   .tv-main-grid {
     grid-template-columns: 1fr;
-    padding: 18px;
-    gap: 18px;
+    padding: 20px;
+    gap: 20px;
   }
 }
 
 .tv-serving-box {
-  background: linear-gradient(145deg, #072e29, #021a16);
-  border: 3px solid #10b981;
-  border-radius: 16px;
+  background: #ffffff;
+  border: 2px solid #a7f3d0;
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 44px 32px;
   text-align: center;
-  box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);
+  box-shadow: 
+    0 20px 45px -15px rgba(4, 120, 87, 0.12),
+    0 4px 16px rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(16, 185, 129, 0.1);
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .tv-serving-label {
-  font-size: 1.2rem;
-  font-weight: 900;
+  font-size: 1.05rem;
+  font-weight: 800;
   letter-spacing: 0.12em;
-  color: #6ee7b7;
-  display: flex;
+  color: #047857;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 8px 22px;
+  border-radius: 9999px;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
 }
 
 .tv-pulsing-dot {
-  width: 14px;
-  height: 14px;
-  background-color: #10b981;
+  width: 12px;
+  height: 12px;
+  background-color: #047857;
   border-radius: 50%;
-  animation: pulse-ring 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: tvPulse 1.8s infinite;
 }
 
 .tv-number-display {
-  font-size: clamp(5rem, 12vw, 10rem);
+  font-size: clamp(6rem, 14vw, 12rem);
   font-weight: 900;
-  color: #ffffff;
-  font-family: var(--font-mono, monospace);
+  color: #047857;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   line-height: 1;
-  text-shadow: 0 0 35px rgba(52, 211, 153, 0.4);
+  text-shadow: 0 4px 20px rgba(4, 120, 87, 0.15);
   letter-spacing: -0.02em;
-  margin: 12px 0 24px;
+  margin: 0;
 }
 
 .tv-customer-callout {
-  background-color: rgba(0, 0, 0, 0.35);
-  padding: 12px 28px;
-  border-radius: 8px;
-  font-size: 1.5rem;
+  background-color: #f8fafc;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  padding: 14px 32px;
+  border-radius: 14px;
+  font-size: 1.55rem;
   font-weight: 700;
-  color: #ecfdf5;
-  margin-bottom: 24px;
+  color: #0f172a;
+  margin-bottom: 0;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.02);
 }
 
 .tv-customer-callout .tv-lbl {
-  color: #94a3b8;
-  margin-right: 8px;
+  color: #64748b;
+  margin-right: 10px;
+  font-weight: 600;
+  font-size: 1.25rem;
 }
 
 .tv-customer-callout .tv-name {
-  color: #34d399;
+  color: #0e4c49;
+  font-weight: 800;
+  font-size: 1.6rem;
+}
+
+.tv-idle-text {
+  color: #64748b;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .tv-counter-ref {
   font-size: 1.15rem;
-  font-weight: 700;
-  color: #a7f3d0;
-  letter-spacing: 0.05em;
+  font-weight: 800;
+  color: #047857;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 10px 24px;
+  border-radius: 12px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  box-shadow: 0 2px 4px rgba(4, 120, 87, 0.05);
 }
 
 /* Side Panel on TV */
@@ -2703,105 +2887,124 @@ a {
 }
 
 .tv-next-box {
-  background-color: #042521;
-  border: 1px solid #0d4a42;
-  border-radius: 12px;
-  padding: 24px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 20px;
+  padding: 26px;
   flex: 1;
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
 }
 
 .tv-panel-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 800;
-  color: #94a3b8;
-  letter-spacing: 0.06em;
-  border-bottom: 1px solid #0d4a42;
-  padding-bottom: 12px;
-  margin-bottom: 16px;
+  color: #0f172a;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .tv-wait-count {
-  color: #34d399;
+  color: #047857;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
 .tv-next-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tv-next-item {
   display: flex;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.04);
-  padding: 12px 16px;
-  border-radius: 8px;
-  border-left: 4px solid #047857;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 5px solid #047857;
+  padding: 14px 18px;
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tv-next-item:hover {
+  transform: translateX(3px);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.05);
 }
 
 .tv-pos {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 800;
-  color: #94a3b8;
-  width: 45px;
+  color: #64748b;
+  width: 44px;
 }
 
 .tv-ticket {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 900;
-  font-family: monospace;
-  color: #ffffff;
-  width: 110px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  color: #047857;
+  width: 120px;
 }
 
 .tv-cname {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #ecfdf5;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tv-empty-wait {
   text-align: center;
-  padding: 30px;
-  color: #64748b;
-  font-size: 1.1rem;
+  padding: 40px 20px;
+  color: #94a3b8;
+  font-size: 1.15rem;
+  font-weight: 500;
 }
 
 .tv-qr-box {
-  background-color: #042521;
-  border: 1px solid #0d4a42;
-  border-radius: 12px;
-  padding: 20px 24px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 20px;
+  padding: 22px 26px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 22px;
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
 }
 
 .tv-qr-image {
-  width: 110px;
-  height: 110px;
-  border-radius: 8px;
+  width: 114px;
+  height: 114px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
   background-color: #ffffff;
   padding: 6px;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 .tv-qr-info h4 {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  color: #34d399;
+  color: #047857;
   margin: 0 0 6px;
+  letter-spacing: -0.01em;
 }
 
 .tv-qr-info p {
-  font-size: 0.85rem;
-  color: #94a3b8;
+  font-size: 0.9rem;
+  color: #64748b;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.45;
+  font-weight: 500;
 }
 
 /* Settings Page Refined Layout */
