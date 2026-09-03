@@ -44,7 +44,7 @@ export function CustomerQueuePage({ queueSlug = '', onNavigate }) {
       const paramDesc = searchParams.get('desc') || '';
       const paramId = searchParams.get('qid') || 'q_' + queueSlug;
 
-      if (paramName || (queueSlug && queueSlug !== 'utama-walkin')) {
+      if (paramName || (queueSlug && queueSlug !== 'main-walkin')) {
         const queueName = paramName ? decodeURIComponent(paramName) : (queueSlug.toUpperCase());
         q = {
           id: paramId,

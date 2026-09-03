@@ -39,7 +39,7 @@ export function App() {
     if (resetParam === 'credentials' || resetParam === 'all' || resetParam === 'true') {
       resetAllCredentials();
       setCurrentUser(null);
-      showToast('Semua credential dan sesi telah berjaya direset!');
+      showToast('All credentials and sessions have been reset successfully!');
     }
 
     if (pageParam === 'customer') {
@@ -130,6 +130,7 @@ export function App() {
           initialMode={activeRoute === 'register' ? 'register' : 'login'}
           onNavigate={handleNavigate}
           onAuthSuccess={handleAuthSuccess}
+          showToast={showToast}
         />
         {toastMsg && (
           <div className="toast-container">

@@ -76,7 +76,7 @@ export function TvDisplayPage({ queueSlug = '', onNavigate }) {
               </span>
               <span className="tv-queue-name">
                 <span className="tv-queue-dot"></span>
-                {queue?.name || 'Kaunter Utama'}
+                {queue?.name || 'Main Counter'}
               </span>
             </div>
           </div>
@@ -128,13 +128,13 @@ export function TvDisplayPage({ queueSlug = '', onNavigate }) {
           {/* Next in line */}
           <div className="tv-next-box">
             <div className="tv-panel-title">
-              <span>SENARAI GILIRAN SETERUSNYA</span>
-              <span className="tv-wait-count">{waitingEntries.length} Menunggu</span>
+              <span>NEXT IN LINE</span>
+              <span className="tv-wait-count">{waitingEntries.length} Waiting</span>
             </div>
 
             {waitingEntries.length === 0 ? (
               <div className="tv-empty-wait">
-                Tiada pelanggan sedang menunggu.
+                No customers currently waiting.
               </div>
             ) : (
               <div className="tv-next-list">
@@ -155,8 +155,8 @@ export function TvDisplayPage({ queueSlug = '', onNavigate }) {
               <img src={qrDataUrl} alt="Scan QR" className="tv-qr-image" />
             )}
             <div className="tv-qr-info">
-              <h4>IMBAS DENGAN KAMERA</h4>
-              <p>Ambil nombor giliran digital terus ke telefon pintar anda. Tanpa perlu download sebarang app!</p>
+              <h4>SCAN WITH CAMERA</h4>
+              <p>Take your digital queue number directly on your smartphone. No app download needed!</p>
             </div>
           </div>
         </section>

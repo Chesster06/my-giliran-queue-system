@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { loginUser, registerUser, signInWithGoogle } from '../lib/authStore';
 
-export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
+export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess, showToast }) {
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,6 +14,7 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotStatus, setForgotStatus] = useState('');
+  const [localToast, setLocalToast] = useState('');
 
   useEffect(() => {
     setMode(initialMode);
@@ -60,15 +61,12 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
     }
   }
 
-  async function handleGoogleLogin() {
-    setIsLoading(true);
-    setErrorMsg('');
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      setErrorMsg(err.message || 'Google sign-in error.');
-    } finally {
-      setIsLoading(false);
+  function handleGoogleLogin() {
+    if (showToast) {
+      showToast('Coming soon');
+    } else {
+      setLocalToast('Coming soon');
+      setTimeout(() => setLocalToast(''), 3000);
     }
   }
 
@@ -236,7 +234,27 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                     <line x1="12" y1="17" x2="12.01" y2="17"/>
                   </svg>
                 </span>
-                <span>{errorMsg}</span>
+                <div>
+                  <span>{errorMsg}</span>
+                  {mode === 'login' && errorMsg.toLowerCase().includes('not registered') && (
+                    <button
+                      type="button"
+                      onClick={() => switchMode('register')}
+                      style={{
+                        marginLeft: '6px',
+                        background: 'none',
+                        border: 'none',
+                        color: 'inherit',
+                        fontWeight: '800',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        display: 'inline'
+                      }}
+                    >
+                      Sign up here
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -250,6 +268,8 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                 <span>{successMsg}</span>
               </div>
             )}
+
+
 
             {/* Authentication Form */}
             <form key={`form-${mode}`} onSubmit={handleSubmit} className="auth-form auth-switch-animated" noValidate>
@@ -265,7 +285,7 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                       id="auth-name"
                       type="text"
                       className="auth-input-line"
-                      placeholder="e.g. Ahmad Albab"
+                      placeholder="e.g. John Doe"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
@@ -281,7 +301,7 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                       id="auth-biz"
                       type="text"
                       className="auth-input-line"
-                      placeholder="e.g. Klinik & Farmasi Utama"
+                      placeholder="e.g. Main Clinic & Pharmacy"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
                       autoComplete="off"
@@ -299,7 +319,7 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
                   id="auth-email"
                   type="email"
                   className="auth-input-line"
-                  placeholder="anda@email.com"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -447,6 +467,13 @@ export function AuthPage({ initialMode = 'login', onNavigate, onAuthSuccess }) {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Fallback Toast Notification */}
+      {localToast && !showToast && (
+        <div className="toast-container">
+          <div className="toast">{localToast}</div>
         </div>
       )}
 

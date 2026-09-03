@@ -16,6 +16,7 @@ import {
 } from '../lib/queueStore';
 import { generateQrDataUrl } from '../lib/qrcode';
 import { getCustomerAccessUrl } from '../lib/networkConfig';
+import { deleteCurrentAccountAndData } from '../lib/authStore';
 import { AdminSidebar } from '../components/AdminSidebar';
 import {
   TvIcon,
@@ -60,9 +61,14 @@ export function AdminDashboardPage({ onNavigate }) {
   const [saveProjectStatus, setSaveProjectStatus] = useState('');
 
   // Global Settings State
-  const [merchantName, setMerchantName] = useState(localStorage.getItem('mygiliran_merchant_name') || 'Klinik & Kaunter Servis');
-  const [branchName, setBranchName] = useState(localStorage.getItem('mygiliran_branch_name') || 'Cawangan Utama');
+  const [merchantName, setMerchantName] = useState(localStorage.getItem('mygiliran_merchant_name') || 'Main Clinic & Service Counter');
+  const [branchName, setBranchName] = useState(localStorage.getItem('mygiliran_branch_name') || 'Main Branch');
   const [settingsSaved, setSettingsSaved] = useState(false);
+
+  // Delete Account State
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   // Load initial data and subscribe
   useEffect(() => {
@@ -241,6 +247,23 @@ export function AdminDashboardPage({ onNavigate }) {
       setCallAlertMsg('All projects and queue tickets have been completely cleared.');
       setTimeout(() => setCallAlertMsg(''), 4000);
       refreshAllData();
+    }
+  }
+
+  // Delete Current Account and Complete Database Records
+  async function handleConfirmDeleteAccount() {
+    setIsDeletingAccount(true);
+    try {
+      await deleteCurrentAccountAndData();
+      setShowDeleteAccountModal(false);
+      if (onNavigate) {
+        onNavigate('landing');
+      } else {
+        window.location.reload();
+      }
+    } catch (err) {
+      alert('Error deleting account: ' + (err.message || 'Unknown error'));
+      setIsDeletingAccount(false);
     }
   }
 
@@ -1208,6 +1231,30 @@ export function AdminDashboardPage({ onNavigate }) {
                       </button>
                     </div>
                   </div>
+
+                  {/* Row 3: Delete Account & Complete Database Wipe */}
+                  <div className="danger-zone-row" style={{ borderTop: '1px solid #fee2e2' }}>
+                    <div className="danger-zone-meta">
+                      <h4 className="danger-zone-title critical" style={{ color: '#991b1b' }}>Delete Account & Database</h4>
+                      <p className="danger-zone-desc">
+                        Permanently delete your admin user account credentials, merchant configuration, and wipe all queues and customer records from the database.
+                      </p>
+                    </div>
+                    <div className="danger-zone-action">
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        style={{ backgroundColor: '#991b1b', color: '#ffffff', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: '700', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setDeleteConfirmText('');
+                          setShowDeleteAccountModal(true);
+                        }}
+                      >
+                        <TrashIcon size={14} />
+                        <span>Delete Account</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1244,7 +1291,7 @@ export function AdminDashboardPage({ onNavigate }) {
                 <label className="auth-label">Project / Counter Name</label>
                 <input
                   type="text"
-                  placeholder="e.g. Kaunter Pendaftaran, Pharmacy, Dr. Room 1"
+                  placeholder="e.g. Registration Counter, Pharmacy, Consultation Room"
                   className="auth-input-line"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
@@ -1376,6 +1423,108 @@ export function AdminDashboardPage({ onNavigate }) {
                 <PrinterIcon size={14} />
                 <span>Print Standee</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: DELETE ACCOUNT & DATABASE WIPE CONFIRMATION */}
+      {showDeleteAccountModal && (
+        <div className="admin-modal-backdrop" onClick={() => !isDeletingAccount && setShowDeleteAccountModal(false)}>
+          <div className="admin-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+            <div className="modal-header-row" style={{ borderBottom: '1px solid #fee2e2', paddingBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  backgroundColor: '#fee2e2',
+                  color: '#dc2626',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, color: '#991b1b', fontSize: '1.15rem', fontWeight: '800' }}>Delete Account & Database?</h3>
+                  <span style={{ fontSize: '0.78rem', color: '#dc2626', fontWeight: '600' }}>Irreversible Action</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => !isDeletingAccount && setShowDeleteAccountModal(false)}
+                disabled={isDeletingAccount}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ marginTop: '16px' }}>
+              <p style={{ color: '#374151', fontSize: '0.9rem', lineHeight: '1.5', margin: '0 0 12px 0' }}>
+                Are you sure you want to permanently delete your account? This action cannot be undone.
+              </p>
+
+              <div style={{ backgroundColor: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '8px', padding: '12px 14px', marginBottom: '18px' }}>
+                <div style={{ fontWeight: '700', fontSize: '0.82rem', color: '#9f1239', marginBottom: '6px' }}>
+                  The following data will be permanently purged:
+                </div>
+                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '0.82rem', color: '#881337', lineHeight: '1.6' }}>
+                  <li>Your user login credentials, profile, and session</li>
+                  <li>Merchant name, counter locations, and settings</li>
+                  <li>All projects, counter queues, and active customer tickets</li>
+                  <li>All records stored in Supabase Cloud database</li>
+                </ul>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#4b5563', marginBottom: '6px' }}>
+                  Please type <span style={{ color: '#dc2626', fontWeight: '800' }}>DELETE</span> to confirm:
+                </label>
+                <input
+                  type="text"
+                  className="auth-input-line"
+                  placeholder="Type DELETE"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  disabled={isDeletingAccount}
+                  autoFocus
+                  style={{ borderColor: '#fca5a5' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowDeleteAccountModal(false)}
+                  disabled={isDeletingAccount}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  style={{
+                    backgroundColor: deleteConfirmText.trim().toUpperCase() === 'DELETE' ? '#dc2626' : '#fca5a5',
+                    color: '#ffffff',
+                    border: 'none',
+                    fontWeight: '700',
+                    cursor: deleteConfirmText.trim().toUpperCase() === 'DELETE' && !isDeletingAccount ? 'pointer' : 'not-allowed'
+                  }}
+                  onClick={handleConfirmDeleteAccount}
+                  disabled={deleteConfirmText.trim().toUpperCase() !== 'DELETE' || isDeletingAccount}
+                >
+                  {isDeletingAccount ? 'Deleting...' : 'Permanently Delete Account'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

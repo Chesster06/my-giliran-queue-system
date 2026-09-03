@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getCurrentUser, subscribeToAuth } from '../lib/authStore';
 
+export const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cdefs%3E%3CclipPath id='c'%3E%3Ccircle cx='64' cy='64' r='64'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23c)'%3E%3Crect width='128' height='128' fill='%23E2E8F0'/%3E%3Ccircle cx='64' cy='46' r='24' fill='%2364748B'/%3E%3Cpath d='M64 78c-23.2 0-42 16.8-42 37.5 0 4.1 3.4 7.5 7.5 7.5h69c4.1 0 7.5-3.4 7.5-7.5C106 94.8 87.2 78 64 78z' fill='%2364748B'/%3E%3C/g%3E%3C/svg%3E";
+
 export function AdminSidebar({
   collapsed,
   onToggleCollapse,
@@ -22,11 +24,19 @@ export function AdminSidebar({
   const [profileName, setProfileName] = useState(initialUser?.name || localStorage.getItem('mygiliran_profile_name') || 'Admin');
   const [profileRole, setProfileRole] = useState(initialUser?.role || localStorage.getItem('mygiliran_profile_role') || 'Owner');
   const [profileEmail, setProfileEmail] = useState(initialUser?.email || localStorage.getItem('mygiliran_profile_email') || '');
-  const [profileAvatar, setProfileAvatar] = useState(
-    initialUser?.avatar ||
-    localStorage.getItem('mygiliran_profile_avatar') ||
-    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-  );
+  
+  const getInitialAvatar = () => {
+    if (initialUser?.avatar && !initialUser.avatar.includes('images.unsplash.com')) {
+      return initialUser.avatar;
+    }
+    const saved = localStorage.getItem('mygiliran_profile_avatar');
+    if (saved && !saved.includes('images.unsplash.com')) {
+      return saved;
+    }
+    return DEFAULT_AVATAR;
+  };
+
+  const [profileAvatar, setProfileAvatar] = useState(getInitialAvatar);
 
   useEffect(() => {
     const unsub = subscribeToAuth((user) => {
@@ -34,11 +44,16 @@ export function AdminSidebar({
         setProfileName(user.name || 'Admin');
         setProfileEmail(user.email || '');
         setProfileRole(user.role || 'Owner');
-        if (user.avatar) setProfileAvatar(user.avatar);
+        if (user.avatar && !user.avatar.includes('images.unsplash.com')) {
+          setProfileAvatar(user.avatar);
+        } else {
+          setProfileAvatar(DEFAULT_AVATAR);
+        }
       } else {
         setProfileName('Admin');
         setProfileEmail('');
         setProfileRole('Owner');
+        setProfileAvatar(DEFAULT_AVATAR);
       }
     });
     return () => {
@@ -73,10 +88,15 @@ export function AdminSidebar({
     e.preventDefault();
     setProfileName(editName);
     setProfileEmail(editEmail);
-    setProfileAvatar(editAvatar);
+    const finalAvatar = editAvatar || DEFAULT_AVATAR;
+    setProfileAvatar(finalAvatar);
     localStorage.setItem('mygiliran_profile_name', editName);
     localStorage.setItem('mygiliran_profile_email', editEmail);
-    localStorage.setItem('mygiliran_profile_avatar', editAvatar);
+    if (finalAvatar === DEFAULT_AVATAR) {
+      localStorage.removeItem('mygiliran_profile_avatar');
+    } else {
+      localStorage.setItem('mygiliran_profile_avatar', finalAvatar);
+    }
     setShowEditModal(false);
   }
 
@@ -195,7 +215,7 @@ export function AdminSidebar({
           {/* User Profile Trigger Box */}
           <div className="sidebar-profile-box">
             
-            {/* Popover Profile Menu ("Click Je Ada Isi") */}
+            {/* Popover Profile Menu */}
             {showProfileMenu && (
               <div className="sidebar-profile-popover" onClick={(e) => e.stopPropagation()}>
                 {/* Popover Header Card */}
@@ -320,10 +340,10 @@ export function AdminSidebar({
 
             <form onSubmit={handleSaveProfile} style={{ marginTop: '16px' }}>
               {/* Circular Avatar with Small Pencil Icon */}
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
                 <div style={{ position: 'relative', width: '80px', height: '80px' }}>
                   <img
-                    src={editAvatar}
+                    src={editAvatar || DEFAULT_AVATAR}
                     alt="Avatar Preview"
                     style={{
                       width: '80px',
@@ -368,6 +388,25 @@ export function AdminSidebar({
                     />
                   </label>
                 </div>
+                {editAvatar && editAvatar !== DEFAULT_AVATAR && (
+                  <button
+                    type="button"
+                    onClick={() => setEditAvatar(DEFAULT_AVATAR)}
+                    style={{
+                      marginTop: '8px',
+                      background: 'none',
+                      border: 'none',
+                      color: '#64748b',
+                      fontSize: '0.78rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      padding: '2px 8px',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    Reset to default icon
+                  </button>
+                )}
               </div>
 
               <div className="auth-field-group" style={{ marginBottom: '14px' }}>
