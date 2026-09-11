@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getAllQueues, getQueueBySlug, getQueueEntries, playCallChime, subscribeToQueue, QUEUE_STATUS } from '../lib/queueStore';
+import React, { useState, useEffect, useRef } from 'react';
+import { getAllQueues, getQueueBySlug, getQueueEntries, playCallChime, playChimeAndVoice, subscribeToQueue, QUEUE_STATUS } from '../lib/queueStore';
 import { generateQrDataUrl } from '../lib/qrcode';
 import { getCustomerAccessUrl } from '../lib/networkConfig';
 
@@ -9,6 +9,9 @@ export function TvDisplayPage({ queueSlug = '', onNavigate }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [prevServing, setPrevServing] = useState('');
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [audioMuted, setAudioMuted] = useState(false);
+  const isFirstLoad = useRef(true);
 
   // Clock timer
   useEffect(() => {
@@ -23,7 +26,7 @@ export function TvDisplayPage({ queueSlug = '', onNavigate }) {
     return () => {
       if (unsub) unsub();
     };
-  }, [queueSlug]);
+  }, [queueSlug, voiceEnabled, audioMuted]);
 
   function refresh() {
     let q = queueSlug ? getQueueBySlug(queueSlug) : null;
@@ -36,13 +39,20 @@ export function TvDisplayPage({ queueSlug = '', onNavigate }) {
       const qEntries = getQueueEntries(q.id);
       setEntries(qEntries);
 
-      // Play chime if serving number changed
+      // Play sound and voice announcement if serving number changed
       if (q.current_serving && q.current_serving !== '-' && q.current_serving !== prevServing) {
-        if (prevServing !== '') {
-          playCallChime();
+        if (!isFirstLoad.current && prevServing !== '') {
+          if (!audioMuted) {
+            if (voiceEnabled) {
+              playChimeAndVoice(q.current_serving, q.name || 'Kaunter', 'ms-MY');
+            } else {
+              playCallChime();
+            }
+          }
         }
         setPrevServing(q.current_serving);
       }
+      isFirstLoad.current = false;
 
       // Generate on-screen QR for TV using phone Wi-Fi LAN address
       const customerUrl = getCustomerAccessUrl(q.slug);
@@ -86,6 +96,67 @@ export function TvDisplayPage({ queueSlug = '', onNavigate }) {
           <div className="tv-clock">
             {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </div>
+
+          {/* Sound Mute / Unmute Toggle */}
+          <button
+            type="button"
+            className="tv-ctrl-btn"
+            onClick={() => setAudioMuted((prev) => !prev)}
+            title={audioMuted ? "Unmute Audio" : "Mute Audio"}
+            aria-label={audioMuted ? "Unmute Audio" : "Mute Audio"}
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: audioMuted ? '#ef4444' : 'inherit' }}
+          >
+            {audioMuted ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="1" y1="1" x2="23" y2="23" />
+                <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" />
+                <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+                <line x1="8" y1="23" x2="16" y2="23" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+            )}
+          </button>
+
+          {/* Voice Announcement Toggle */}
+          <button
+            type="button"
+            className="tv-ctrl-btn"
+            onClick={() => setVoiceEnabled((prev) => !prev)}
+            title={voiceEnabled ? "Voice Callout: ON" : "Voice Callout: OFF (Chime Only)"}
+            aria-label={voiceEnabled ? "Disable Voice Callout" : "Enable Voice Callout"}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', fontWeight: '700', padding: '0 10px', width: 'auto', minWidth: '42px' }}
+          >
+            <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>TTS</span>
+            <span style={{ color: voiceEnabled ? '#10b981' : '#94a3b8' }}>{voiceEnabled ? 'ON' : 'OFF'}</span>
+          </button>
+
+          {/* Test Sound Button */}
+          <button
+            type="button"
+            className="tv-ctrl-btn"
+            onClick={() => {
+              const testNum = queue?.current_serving && queue.current_serving !== '-' ? queue.current_serving : 'A001';
+              if (voiceEnabled) {
+                playChimeAndVoice(testNum, queue?.name || 'Kaunter', 'ms-MY');
+              } else {
+                playCallChime();
+              }
+            }}
+            title="Test Chime & Voice"
+            aria-label="Test Chime & Voice"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          </button>
+
           <button
             type="button"
             className="tv-ctrl-btn"

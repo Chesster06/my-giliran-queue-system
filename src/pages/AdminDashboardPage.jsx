@@ -7,6 +7,7 @@ import {
   updateQueueSettings,
   resetQueueCounter,
   playCallChime,
+  playChimeAndVoice,
   createNewQueue,
   deleteQueue,
   joinQueue,
@@ -109,11 +110,12 @@ export function AdminDashboardPage({ onNavigate }) {
   // Handle Call Next inside Project
   function handleCallNext(project) {
     if (!project) return;
-    playCallChime();
     const nextEntry = callNextNumber(project.id);
     if (nextEntry) {
+      playChimeAndVoice(nextEntry.queue_number, project.name || 'Kaunter', 'ms-MY');
       setCallAlertMsg(`Calling Number ${nextEntry.queue_number} (${nextEntry.customer_name})!`);
     } else {
+      playCallChime();
       setCallAlertMsg(`No waiting customers in ${project.name}.`);
     }
     setTimeout(() => setCallAlertMsg(''), 4500);
@@ -123,7 +125,7 @@ export function AdminDashboardPage({ onNavigate }) {
   // Handle Recall
   function handleRecall(project) {
     if (!project || !project.current_serving || project.current_serving === '-') return;
-    playCallChime();
+    playChimeAndVoice(project.current_serving, project.name || 'Kaunter', 'ms-MY');
     setCallAlertMsg(`Recalling Number ${project.current_serving} to ${project.name}!`);
     setTimeout(() => setCallAlertMsg(''), 4000);
   }
@@ -919,7 +921,7 @@ export function AdminDashboardPage({ onNavigate }) {
                                   onClick={() => {
                                     updateEntryStatus(entry.id, QUEUE_STATUS.SERVING);
                                     updateQueueSettings(selectedProject.id, { current_serving: entry.queue_number });
-                                    playCallChime();
+                                    playChimeAndVoice(entry.queue_number, selectedProject.name || 'Kaunter', 'ms-MY');
                                     refreshAllData();
                                   }}
                                 >
@@ -993,7 +995,7 @@ export function AdminDashboardPage({ onNavigate }) {
                                         onClick={() => {
                                           updateEntryStatus(item.id, QUEUE_STATUS.SERVING);
                                           updateQueueSettings(selectedProject.id, { current_serving: item.queue_number });
-                                          playCallChime();
+                                          playChimeAndVoice(item.queue_number, selectedProject.name || 'Kaunter', 'ms-MY');
                                           refreshAllData();
                                         }}
                                       >
@@ -1149,21 +1151,21 @@ export function AdminDashboardPage({ onNavigate }) {
               {/* SECTION 2: AUDIO CHIME TEST */}
               <div className="settings-action-row">
                 <div>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', margin: '0 0 4px 0' }}>
-                    Audio Chime Speaker Test
+                  <h3 className="section-title" style={{ fontSize: '1.05rem', marginBottom: '4px' }}>
+                    Audio Chime & Voice Callout Test
                   </h3>
                   <p className="text-muted text-sm" style={{ margin: 0 }}>
-                    Test the high-definition Ding-Dong airport chime played through speakers when calling customer tickets.
+                    Test the dual-tone airport chime and browser speech voice announcement (Malay / English) used when calling tickets.
                   </p>
                 </div>
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                  onClick={() => playCallChime()}
+                  onClick={() => playChimeAndVoice('A001', 'Kaunter 1', 'ms-MY')}
                 >
                   <VolumeIcon size={14} />
-                  <span>Test Chime Sound</span>
+                  <span>Test Chime & Voice</span>
                 </button>
               </div>
 

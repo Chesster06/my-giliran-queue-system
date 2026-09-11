@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getAllQueues, getQueueBySlug, getEntriesByQueue, joinQueue } from '../lib/queueStore';
+import React, { useState, useEffect, useRef } from 'react';
+import { getAllQueues, getQueueBySlug, getEntriesByQueue, joinQueue, playCallChime, triggerHapticNotification } from '../lib/queueStore';
 import { QUEUE_STATUS } from '../constants';
 import { Badge } from '../components/Badge';
 
@@ -10,6 +10,7 @@ export function CustomerQueuePage({ queueSlug = '', onNavigate }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [queueEntries, setQueueEntries] = useState([]);
+  const prevMyStatus = useRef(null);
 
   useEffect(() => {
     loadQueueData();
@@ -21,6 +22,7 @@ export function CustomerQueuePage({ queueSlug = '', onNavigate }) {
       const found = allEntries.find((e) => e.id === savedEntryId);
       if (found) {
         setMyEntry(found);
+        prevMyStatus.current = found.status;
       }
     }
 
@@ -87,6 +89,11 @@ export function CustomerQueuePage({ queueSlug = '', onNavigate }) {
       if (myEntry) {
         const refreshed = entries.find((e) => e.id === myEntry.id);
         if (refreshed) {
+          if (refreshed.status === QUEUE_STATUS.SERVING && prevMyStatus.current !== QUEUE_STATUS.SERVING) {
+            triggerHapticNotification();
+            playCallChime();
+          }
+          prevMyStatus.current = refreshed.status;
           setMyEntry(refreshed);
         }
       }
@@ -218,10 +225,36 @@ export function CustomerQueuePage({ queueSlug = '', onNavigate }) {
             <Badge status={myEntry.status} />
           </div>
 
-          <div style={{ backgroundColor: 'var(--bg-app)', borderRadius: 'var(--radius-md)', padding: '16px', marginBottom: '24px' }}>
+          <div
+            style={{
+              backgroundColor: myEntry.status === QUEUE_STATUS.SERVING ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-app)',
+              border: myEntry.status === QUEUE_STATUS.SERVING ? '1.5px solid #10b981' : '1px solid transparent',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px',
+              marginBottom: '24px',
+              transition: 'all 0.3s ease'
+            }}
+          >
             {myEntry.status === QUEUE_STATUS.SERVING ? (
-              <div style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '1.05rem' }}>
-                Your ticket is now being called to the counter!
+              <div>
+                <div style={{ color: '#059669', fontWeight: '800', fontSize: '1.15rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 0 4px rgba(16, 185, 129, 0.3)' }}></span>
+                  Giliran Anda Sedang Dipanggil!
+                </div>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-main)', marginTop: '6px', marginBottom: '10px' }}>
+                  Sila segera ke kaunter perkhidmatan.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playCallChime();
+                    triggerHapticNotification();
+                  }}
+                  className="btn btn-sm"
+                  style={{ backgroundColor: '#10b981', color: '#fff', fontSize: '0.8rem', padding: '6px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                >
+                  Bunyikan Semula Alert
+                </button>
               </div>
             ) : myEntry.status === QUEUE_STATUS.COMPLETED ? (
               <div style={{ color: 'var(--info)', fontWeight: '700', fontSize: '0.95rem' }}>
